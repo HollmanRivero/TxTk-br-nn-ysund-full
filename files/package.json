@@ -1,0 +1,16 @@
+{
+  "name": "txtk-brreg",
+  "version": "1.0.0",
+  "description": "TXTk – Søk i Brønnøysundregistrene",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
