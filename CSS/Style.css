@@ -1,0 +1,77 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0b1020;
+    color: #e5e7eb;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+}
+
+.hovedmeny {
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+    padding: 12px 0;
+}
+
+.hovedmeny ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.hovedmeny ul li a {
+    color: #e5e7eb;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-weight: 600;
+}
+
+.hovedmeny ul li a:hover {
+    background: #2563eb;
+    color: white;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+h1 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+p {
+    color: #cbd5e1;
+    line-height: 1.7;
+}
+
+.whatsapp-flytende {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25D366;
+    border-radius: 50%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.whatsapp-flytende img {
+    width: 35px;
+    height: 35px;
+}

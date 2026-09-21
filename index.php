@@ -1,12 +1,15 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="nb">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TXTk – Brønnøysundregistrene Søk</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="CSS/Style.css">
   <style>
-    :root {
+      :root {
       --bg: #0a0e17;
       --surface: #111827;
       --surface-2: #1a2234;
@@ -24,26 +27,6 @@
       --red: #ef4444;
       --red-dim: rgba(239, 68, 68, 0.12);
       --radius: 10px;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: -40%; left: -20%;
-      width: 70vw; height: 70vw;
-      background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     .app { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
@@ -338,9 +321,15 @@
       .detail-grid { grid-template-columns: 1fr; }
       header h1 { font-size: 1.5rem; }
     }
-  </style>
+    </style>
 </head>
 <body>
+  <nav class="hovedmeny">
+    <ul>
+      <li><a href="/">Hjem</a></li>
+      <li><a href="index.php">Brønnøysundsregisteret</a></li>
+    </ul>
+  </nav>
   <div class="app">
     <header>
       <div class="logo">TXTk</div>
@@ -431,19 +420,20 @@
 
     async function initFilters() {
       try {
-        const res = await fetch('https://data.brreg.no/enhetsregisteret/api/kommuner?size=500');
-        const data = await res.json();
-        alleKommuner = data._embedded?.kommuner || [];
-
         const fylkeSelect = document.getElementById('filterFylke');
         const kommuneSelect = document.getElementById('filterKommune');
 
+        // Populate fylker first so it doesn't break if fetch fails
         Object.entries(FYLKER).forEach(([nr, navn]) => {
           const opt = document.createElement('option');
           opt.value = nr;
           opt.textContent = navn;
           fylkeSelect.appendChild(opt);
         });
+
+        const res = await fetch('kommuner.json');
+        const data = await res.json();
+        alleKommuner = data._embedded?.kommuner || [];
 
         fylkeSelect.addEventListener('change', () => {
           const fylkeNr = fylkeSelect.value;
@@ -708,5 +698,8 @@
       return d.innerHTML;
     }
   </script>
+  <a href="https://wa.me/4748904267" class="whatsapp-flytende" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+  </a>
 </body>
 </html>

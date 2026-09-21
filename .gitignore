@@ -25,3 +25,5 @@ out/
 # Logs
 logs/
 *.log
+
+temp_deploy/
