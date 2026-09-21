@@ -365,6 +365,9 @@
           <option value="FLI">Forening/lag (FLI)</option>
           <option value="SA">Samvirkeforetak (SA)</option>
         </select>
+        <select id="filterFylke">
+          <option value="">Alle fylker</option>
+        </select>
         <select id="filterKommune">
           <option value="">Alle kommuner</option>
         </select>
@@ -418,6 +421,54 @@
     let totalPages = 0;
     let lastQuery = '';
 
+    const FYLKER = {
+      '03': 'Oslo', '11': 'Rogaland', '15': 'Møre og Romsdal', '18': 'Nordland',
+      '31': 'Østfold', '32': 'Akershus', '33': 'Buskerud', '34': 'Innlandet',
+      '39': 'Vestfold', '40': 'Telemark', '42': 'Agder', '46': 'Vestland',
+      '50': 'Trøndelag', '55': 'Troms', '56': 'Finnmark', '21': 'Svalbard'
+    };
+    let alleKommuner = [];
+
+    async function initFilters() {
+      try {
+        const res = await fetch('https://data.brreg.no/enhetsregisteret/api/kommuner?size=500');
+        const data = await res.json();
+        alleKommuner = data._embedded?.kommuner || [];
+
+        const fylkeSelect = document.getElementById('filterFylke');
+        const kommuneSelect = document.getElementById('filterKommune');
+
+        Object.entries(FYLKER).forEach(([nr, navn]) => {
+          const opt = document.createElement('option');
+          opt.value = nr;
+          opt.textContent = navn;
+          fylkeSelect.appendChild(opt);
+        });
+
+        fylkeSelect.addEventListener('change', () => {
+          const fylkeNr = fylkeSelect.value;
+          kommuneSelect.innerHTML = '<option value="">Alle kommuner</option>';
+          
+          let filteredKommuner = alleKommuner;
+          if (fylkeNr) {
+            filteredKommuner = alleKommuner.filter(k => k.nummer.startsWith(fylkeNr));
+          }
+          
+          filteredKommuner.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k.nummer;
+            opt.textContent = k.navn;
+            kommuneSelect.appendChild(opt);
+          });
+        });
+
+        fylkeSelect.dispatchEvent(new Event('change'));
+      } catch (err) {
+        console.error('Kunne ikke laste kommuner', err);
+      }
+    }
+    initFilters();
+
     input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
     async function doSearch(page = 0) {
@@ -451,8 +502,20 @@
           const orgform = document.getElementById('filterOrgform').value;
           if (orgform) params.set('organisasjonsform', orgform);
 
+          const fylke = document.getElementById('filterFylke').value;
           const kommune = document.getElementById('filterKommune').value;
-          if (kommune) params.set('kommunenummer', kommune);
+          
+          if (kommune) {
+            params.set('kommunenummer', kommune);
+          } else if (fylke) {
+            const fylkeKommuner = alleKommuner
+              .filter(k => k.nummer.startsWith(fylke))
+              .map(k => k.nummer)
+              .join(',');
+            if (fylkeKommuner) {
+              params.set('kommunenummer', fylkeKommuner);
+            }
+          }
 
           const status = document.getElementById('filterStatus').value;
           if (status) params.set('konkurs', status);
