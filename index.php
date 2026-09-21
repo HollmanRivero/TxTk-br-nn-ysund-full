@@ -463,7 +463,13 @@ session_start();
 
     async function doSearch(page = 0) {
       const query = input.value.trim();
-      if (!query) return;
+      const orgform = document.getElementById('filterOrgform').value;
+      const fylke = document.getElementById('filterFylke').value;
+      const kommune = document.getElementById('filterKommune').value;
+      const status = document.getElementById('filterStatus').value;
+
+      // Avbryt kun hvis absolutt ingenting er skrevet eller valgt
+      if (!query && !orgform && !fylke && !kommune && !status) return;
 
       lastQuery = query;
       currentPage = page;
@@ -474,7 +480,7 @@ session_start();
       statusEl.textContent = 'Søker …';
 
       try {
-        const isOrgNr = /^\d{9}$/.test(query.replace(/\s/g, ''));
+        const isOrgNr = query ? /^\d{9}$/.test(query.replace(/\s/g, '')) : false;
 
         if (isOrgNr) {
           const orgnr = query.replace(/\s/g, '');
@@ -487,13 +493,10 @@ session_start();
           statusEl.innerHTML = '<span class="count">1</span> treff';
           resultsEl.innerHTML = renderCard(data);
         } else {
-          const params = new URLSearchParams({ navn: query, size: 20, page });
+          const params = new URLSearchParams({ size: 20, page });
+          if (query) params.set('navn', query);
 
-          const orgform = document.getElementById('filterOrgform').value;
           if (orgform) params.set('organisasjonsform', orgform);
-
-          const fylke = document.getElementById('filterFylke').value;
-          const kommune = document.getElementById('filterKommune').value;
           
           if (kommune) {
             params.set('kommunenummer', kommune);
@@ -507,7 +510,6 @@ session_start();
             }
           }
 
-          const status = document.getElementById('filterStatus').value;
           if (status) params.set('konkurs', status);
 
           const res = await fetch(`${BRREG_API}?${params.toString()}`);
@@ -521,7 +523,7 @@ session_start();
             (totalPages > 1 ? ` · side ${currentPage + 1} av ${totalPages}` : '');
 
           if (enheter.length === 0) {
-            statusEl.textContent = 'Ingen treff. Prøv et annet søkeord.';
+            statusEl.textContent = 'Ingen treff. Prøv andre søkekriterier.';
           } else {
             resultsEl.innerHTML = enheter.map(renderCard).join('');
             renderPagination();
